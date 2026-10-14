@@ -40,10 +40,18 @@ namespace AuthAPI.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto model)
         {
-            // Login logic will go here
-            return Ok();
+            var loginResponse = await _authService.Login(model);
+            if (loginResponse.User == null)
+            {
+                _response.IsSuccess = false;
+                _response.Message = "Invalid username or password";
+                return BadRequest(_response);
+            }
+
+            _response.Result = loginResponse;
+            return Ok(_response);
         }
 
     }
