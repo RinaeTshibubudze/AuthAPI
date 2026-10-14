@@ -8,16 +8,12 @@ using System.Threading.Tasks;
 using AuthAPI.Models;
 using AuthAPI.Service.IService;
 using System.Security.Claims;
+using Microsoft.Extensions.Options;
 namespace AuthAPI.Service
 {
-    public class JwtTokenGenerator : IJwtTokenGenerator
+    public class JwtTokenGenerator(IOptions<JwtOptions> jwtOptions) : IJwtTokenGenerator
     {
-        private readonly JwtOptions _jwtOptions;
-
-        public JwtTokenGenerator(JwtOptions jwtOptions)
-        {
-            _jwtOptions = jwtOptions;
-        }
+        private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
         public string GenerateToken(ApplicationUser applicationUser)
         {

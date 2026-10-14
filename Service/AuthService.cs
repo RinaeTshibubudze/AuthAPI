@@ -10,11 +10,12 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AuthAPI.Service
 {
-    public class AuthService(AppDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager) : IAuthService
+    public class AuthService(AppDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IJwtTokenGenerator jwtTokenGenerator) : IAuthService
     {
         private readonly AppDbContext _context = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+        private readonly IJwtTokenGenerator _jwtTokenGenerator = jwtTokenGenerator;
 
         public async Task<string> Register(RegistrationRequestDto registrationRequestDto)
         {
@@ -80,7 +81,7 @@ namespace AuthAPI.Service
             LoginResponseDto loginResponseDto = new()
             {
                 User = userDto,
-                Token = "" // You would generate a JWT token here
+                Token = _jwtTokenGenerator.GenerateToken(user)
             };
             return loginResponseDto;
         }
