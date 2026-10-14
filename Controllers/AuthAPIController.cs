@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthAPI.Models.Dto;
+using AuthAPI.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -12,11 +14,29 @@ namespace AuthAPI.Controllers
     [ApiController]
     public class AuthAPIController : ControllerBase
     {
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register()
+
+        private readonly IAuthService _authService;
+        protected ResponseDto _response;
+
+        public AuthAPIController(IAuthService authService)
         {
-            // Registration logic will go here
-            return Ok();
+            _authService = authService;
+            _response = new();
+        }
+
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register([FromBody] RegistrationRequestDto model)
+        {
+
+            var errorMessage = await _authService.Register(model);
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                _response.IsSuccess = false;
+                _response.Message = errorMessage;
+                return BadRequest(_response);
+            }
+
+            return Ok(_response);
         }
 
         [HttpPost("Login")]
